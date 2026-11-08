@@ -2,487 +2,628 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <!-- كود منع الزوم في أجهزة الآيفون -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ماركت النجوم - العروض الأسبوعية</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>عروض ماركت النجوم</title>
     <style>
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            background-color: #f8fafc; 
-            padding-bottom: 220px; 
+        /* إعدادات عامة ومنع التكبير المزدوج */
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation; /* يمنع تأخير اللمس والزوم */
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            padding-bottom: 220px; /* مساحة للفوتر الثابت */
         }
-        /* شبكة المنتجات: منتجين في كل سطر */
-        .strict-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 12px; 
-            padding: 0 12px; 
-            max-width: 800px;
-            margin: 0 auto;
+        
+        /* الترويسة والشعار */
+        .header {
+            background-color: #fff;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
         }
-        .item-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            overflow: hidden;
+        .header img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .header h1 {
+            color: #123e73;
+            margin: 10px 0 5px 0;
+            font-size: 2rem;
+        }
+        .header h1 span {
+            color: #dca331;
+        }
+        .info-box {
+            background: #fdfbf7;
+            border: 1px solid #dca331;
+            color: #123e73;
+            margin: 5px 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        .map-btn {
+            display: block;
+            background-color: #123e73;
+            color: white;
+            text-decoration: none;
+            margin: 10px 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        /* شبكة العروض */
+        .section-title {
+            background-color: #123e73;
+            color: #fff;
+            padding: 10px 15px;
+            margin: 20px 15px 10px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            border-right: 5px solid #dca331;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* عرضين في كل سطر */
+            gap: 10px;
+            padding: 0 15px;
+        }
+        .product-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            justify-content: space-between;
         }
-        /* تصميم مربع نوع الصنف البديل للصور */
-        .item-category-banner {
-            width: 100%;
-            height: 100px;
+        .product-type {
+            background: #fdfbf7;
+            color: #dca331;
+            font-weight: bold;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            border: 1px solid #f2e3c6;
+        }
+        .product-name {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+            flex-grow: 1;
+        }
+        .product-price {
+            color: #e44d26;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        /* أزرار التحكم بالكمية */
+        .qty-controls {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            font-weight: 900;
-            border-bottom: 1px solid #f1f5f9;
-            text-align: center;
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 5px;
         }
-        .cart-footer {
+        .qty-btn {
+            background: #123e73;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .qty-btn.minus { background: #dc3545; }
+        .qty-display {
+            font-size: 1.1rem;
+            font-weight: bold;
+            width: 30px;
+        }
+
+        /* الفوتر الثابت (سلة المشتريات) */
+        .sticky-footer {
             position: fixed;
             bottom: 0;
             left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid #e5e7eb;
-            padding: 16px;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
-            z-index: 50;
+            width: 100%;
+            background: #fff;
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 3px solid #dca331;
+            z-index: 100;
         }
-        .category-header {
-            max-width: 800px;
-            margin: 24px auto 16px auto;
-            padding: 0 12px;
+        .total-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fdfbf7;
+            border: 1px solid #dca331;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer; /* للإشارة إلى أنه قابل للضغط */
+            transition: background 0.2s;
         }
+        .total-box:active { background: #f2e3c6; }
+        .total-box-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .total-title { font-weight: bold; color: #123e73; font-size: 1rem; }
+        .total-subtitle { font-size: 0.8rem; color: #666; margin-top: 2px; }
+        .total-amount { font-size: 1.4rem; font-weight: bold; color: #28a745; }
+        
+        .special-requests {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: inherit;
+            margin-bottom: 10px;
+            resize: vertical;
+            min-height: 50px;
+            font-size: 0.9rem;
+        }
+
+        .submit-btn {
+            background-color: #25D366;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* نافذة المراجعة (Modal) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end; /* لظهورها من الأسفل */
+        }
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-height: 80vh;
+            border-radius: 20px 20px 0 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-header h3 { margin: 0; color: #123e73; }
+        .close-modal {
+            background: #dc3545; color: white; border: none;
+            width: 30px; height: 30px; border-radius: 50%;
+            font-weight: bold; font-size: 1.2rem; cursor: pointer;
+        }
+        .modal-items {
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .modal-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        .modal-item-name { font-size: 0.9rem; font-weight: bold; flex-grow: 1; padding-left: 10px; }
+        .modal-empty { text-align: center; color: #888; padding: 20px 0; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- الترويسة الجديدة -->
-    <header class="bg-white py-8 text-center shadow-md relative rounded-b-3xl mb-6">
-        <div class="flex justify-center flex-col items-center">
-            <!-- الشعار عبر الرابط المباشر -->
-            <img src="https://i.postimg.cc/cJ19FTNf/IMG-4755.jpg" alt="النجوم ماركت" style="width: 160px; border-radius: 50%; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-            
-            <!-- اسم المحل بألوان الشعار -->
-            <h1 class="text-4xl font-black mb-4" style="color: #123e73;">
-                ماركت <span style="color: #dca331;">النجوم</span>
-            </h1>
-        </div>
-        
-        <!-- معلومات المحل بتنسيق سطر مستقل لكل معلومة -->
-        <div class="space-y-3 text-sm font-bold mt-2 px-4" style="color: #123e73;">
-            <p class="bg-slate-50 py-2 rounded-lg border border-slate-100 inline-block px-4 w-full max-w-md">
-                ⏰ أوقات الدوام: يومياً من 10 صباحاً إلى 8 مساءً
-            </p>
-            <p class="bg-slate-50 py-2 rounded-lg border border-slate-100 inline-block px-4 w-full max-w-md">
-                📍 Landstraße 11a, 63939 Wörth am Main
-            </p>
-            <a href="https://maps.app.goo.gl/qk8tGDsZNwhD27jPA?g_st=ic" target="_blank" class="bg-[#123e73] text-white py-2 px-4 rounded-lg inline-block w-full max-w-md shadow-sm hover:bg-[#0c2a50] transition-colors flex items-center justify-center gap-2">
-                <span class="text-lg">🗺️</span> للوصول عبر خرائط جوجل اضغط هنا
-            </a>
-        </div>
-    </header>
+    <!-- الترويسة -->
+    <div class="header">
+        <img src="https://i.postimg.cc/NFdZxVKw/IMG-5717.png" alt="غلاف ماركت النجوم">
+        <h1>ماركت <span>النجوم</span></h1>
+        <div class="info-box">⏰ أوقات الدوام: يومياً من 10 صباحاً إلى 8 مساءً</div>
+        <div class="info-box">📍 Landstraße 11a, 63939 Wörth am Main</div>
+        <a href="https://maps.app.goo.gl/qk8tGDsZNwhD27jPA?g_st=ic" class="map-btn" target="_blank">🗺️ للوصول عبر خرائط جوجل اضغط هنا</a>
+    </div>
 
-    <!-- حاوية العروض -->
-    <main id="app-container">
-        <div class="text-center px-4 mb-6">
-            <h2 class="font-black text-xl mb-1" style="color: #dca331;">🛒 جهز قائمة مشترياتك</h2>
-            <p class="text-gray-500 text-sm font-bold">حدد الكميات واحفظ القائمة في واتساب للرجوع إليها بالمحل</p>
-        </div>
-        
-        <div id="categories-container">
-            <!-- سيتم توليد الأقسام والعروض هنا بواسطة الجافاسكربت -->
-        </div>
-    </main>
+    <div id="products-container">
+        <!-- سيتم توليد العروض هنا عبر الجافاسكربت -->
+    </div>
 
-    <!-- شريط سلة المشتريات السفلي -->
-    <footer class="cart-footer">
-        <div class="max-w-2xl mx-auto flex flex-col gap-3">
-            <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-200">
-                <span class="font-bold text-[#123e73] text-lg">مجموع القائمة:</span>
-                <span id="total-price" class="text-[#16a34a] font-black text-2xl" dir="ltr">0.00 €</span>
+    <!-- الفوتر الثابت -->
+    <div class="sticky-footer">
+        <!-- مربع المجموع (يفتح نافذة المراجعة) -->
+        <div class="total-box" onclick="openModal()">
+            <div class="total-box-text">
+                <span class="total-title">مجموع القائمة:</span>
+                <span class="total-subtitle">🛒 اضغط هنا لمراجعة طلباتك</span>
             </div>
-            
-            <button onclick="saveShoppingList()" class="w-full text-white font-black text-lg py-4 rounded-xl shadow-lg hover:bg-green-700 active:scale-95 transition-all flex justify-center items-center gap-2" style="background-color: #16a34a;">
-                <span>حفظ كقائمة مشتريات (واتساب)</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-            </button>
+            <span class="total-amount" id="total-price">0.00 €</span>
         </div>
-    </footer>
+        
+        <!-- حقل الطلبات الخاصة -->
+        <textarea id="special-requests" class="special-requests" placeholder="📝 هل لديك طلبات خاصة غير موجودة بالعروض؟ اكتبها هنا..."></textarea>
+        
+        <button class="submit-btn" onclick="sendWhatsApp()">💾 حفظ كقائمة مشتريات (واتساب)</button>
+    </div>
 
-    <!-- نافذة التنبيه -->
-    <div id="modal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl">
-            <div class="text-5xl mb-4">⚠️</div>
-            <p id="modal-msg" class="text-gray-800 font-bold mb-6 text-lg"></p>
-            <button onclick="closeModal()" class="text-white font-bold py-3 px-8 rounded-xl w-full" style="background-color: #123e73;">حسناً</button>
+    <!-- نافذة المراجعة المنبثقة -->
+    <div id="cartModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🛒 مراجعة القائمة</h3>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div id="modal-items-list" class="modal-items">
+                <!-- سيتم إدراج المنتجات المختارة هنا -->
+            </div>
+            <button class="submit-btn" style="margin-top: 15px; background: #123e73;" onclick="closeModal()">إغلاق ومتابعة التسوق</button>
         </div>
     </div>
 
-    <!-- برمجة الصفحة -->
     <script>
-        // تعريف الأقسام والعروض
-        const categoriesData = [
+        // بيانات العروض مقسمة حسب الأقسام
+        const productsData = [
             {
-                title: "🍚 الأرز، الحبوب، والمعكرونة",
-                label: "أرز وحبوب",
-                bgColor: "bg-orange-100",
-                textColor: "text-orange-800",
+                section: "🍚 الأرز، الحبوب، والمعكرونة",
+                type: "أرز وحبوب",
                 items: [
-                    ["رز بسمتي هابو / طيبة / العائلة / دانة", 10],
-                    ["رز مصري معدنلي / الريان 5 كغ", 9],
-                    ["رز مصري الشهية / صنوايت", 7],
-                    ["برغل خشن / وسط / ناعم 3 أكياس", 5],
-                    ["براغل / برغل مع شعيرية / برغل بني الدرة 3 أكياس", 5],
-                    ["شعيرية هابو 3 أكياس", 5],
-                    ["حمص حب / فاصولية حب 1 كغ 2 كيس", 5],
-                    ["عدس / كسكس 3 أكياس", 5],
-                    ["شعيرية تركية 1 كغ 3 أكياس", 5],
-                    ["شعيرية تركية 0.5 كغ 6 أكياس", 5],
-                    ["معكرونة هابو 6 أكياس", 5],
-                    ["معكرونة إيراني 5 علب", 10],
-                    ["خلطة فلافل داماس أو شامية أو الأديب 2 علبة", 4.99],
-                    ["خلطة فلافل البستان 3 علب", 5],
-                    ["كرتونة إندومي", 12]
+                    { id: "r1", name: "رز بسمتي هابو / طيبة / العائلة / دانة", price: 10 },
+                    { id: "r2", name: "رز مصري معدنلي / الريان (5 كغ)", price: 9 },
+                    { id: "r3", name: "رز مصري الشهية / صنوايت", price: 7 },
+                    { id: "r4", name: "برغل خشن / وسط / ناعم (3 أكياس)", price: 5 },
+                    { id: "r5", name: "براغل / برغل مع شعيرية / برغل بني الدرة (3 أكياس)", price: 5 },
+                    { id: "r6", name: "شعيرية هابو (3 أكياس)", price: 5 },
+                    { id: "r7", name: "حمص حب / فاصولية حب 1 كغ (2 كيس)", price: 5 },
+                    { id: "r8", name: "عدس / كسكس (3 أكياس)", price: 5 },
+                    { id: "r9", name: "شعيرية تركية 1 كغ (3 أكياس)", price: 5 },
+                    { id: "r10", name: "شعيرية تركية 0.5 كغ (6 أكياس)", price: 5 },
+                    { id: "r11", name: "معكرونة هابو (6 أكياس)", price: 5 },
+                    { id: "r12", name: "معكرونة إيراني (5 علب)", price: 10 },
+                    { id: "r13", name: "خلطة فلافل داماس أو شامية أو الأديب (2 علبة)", price: 4.99 },
+                    { id: "r14", name: "خلطة فلافل البستان (3 علب)", price: 5 },
+                    { id: "r15", name: "كرتونة إندومي", price: 12 }
                 ]
             },
             {
-                title: "🧀 الأجبان، البيض، والمجمدات",
-                label: "أجبان ومجمدات",
-                bgColor: "bg-yellow-100",
-                textColor: "text-yellow-800",
+                section: "🧀 الأجبان، البيض، والمجمدات",
+                type: "أجبان ومجمدات",
                 items: [
-                    ["شنتزل دجاج أو ناغتس 1 كيس", 6],
-                    ["جبنة الدانة جدل 1 علبة", 4],
-                    ["جبنة الدانة خيوط 1 علبة", 4],
-                    ["طبق بيض قياس L", 6],
-                    ["بامية / فول / بازيلا ومجمدات أخرى 5 أكياس", 10],
-                    ["بامية مجمدة 3 أكياس", 10]
+                    { id: "c1", name: "شنتزل دجاج أو ناغتس (700 غ)", price: 6 },
+                    { id: "c2", name: "جبنة الدانة جدل (400 غ)", price: 4 },
+                    { id: "c3", name: "جبنة الدانة خيوط (400 غ)", price: 4 },
+                    { id: "c4", name: "طبق بيض قياس L", price: 6 },
+                    { id: "c5", name: "بامية / فول / بازيلا ومجمدات أخرى (5 أكياس)", price: 10 },
+                    { id: "c6", name: "بامية مجمدة 750 غ (3 أكياس)", price: 10 }
                 ]
             },
             {
-                title: "🛢️ الزيوت والسمنة",
-                label: "سمنة وزيت",
-                bgColor: "bg-amber-100",
-                textColor: "text-amber-800",
+                section: "🛢️ الزيوت والسمنة",
+                type: "زيوت وسمنة",
                 items: [
-                    ["سمنة هنا مصرية 1 كغ", 5],
-                    ["سمنة السعد 1 لتر", 5],
-                    ["سمنة السعد 2 لتر", 9],
-                    ["سمنة السعد 4 لتر", 17],
-                    ["سمنة الأصيل 1 لتر", 6],
-                    ["سمنة الأصيل 2 لتر", 11],
-                    ["سمنة الأصيل 4 لتر", 18],
-                    ["سمنة الدرة 1 لتر", 5],
-                    ["سمنة الدرة 2 لتر", 9],
-                    ["سمنة الدرة 4 لتر", 17],
-                    ["سمنة خانم 1 كغ", 13],
-                    ["سمنة خانم 2 علبة", 25],
-                    ["زيت زيتون الفصول الأربعة", 8.99],
-                    ["زيت زيتون هابو", 8]
+                    { id: "o1", name: "سمنة هنا مصرية (1 كغ)", price: 5 },
+                    { id: "o2", name: "سمنة السعد (1 لتر)", price: 5 },
+                    { id: "o3", name: "سمنة السعد (2 لتر)", price: 9 },
+                    { id: "o4", name: "سمنة السعد (4 لتر)", price: 17 },
+                    { id: "o5", name: "سمنة الأصيل (1 لتر)", price: 6 },
+                    { id: "o6", name: "سمنة الأصيل (2 لتر)", price: 11 },
+                    { id: "o7", name: "سمنة الأصيل (4 لتر)", price: 18 },
+                    { id: "o8", name: "سمنة الدرة (1 لتر)", price: 5 },
+                    { id: "o9", name: "سمنة الدرة (2 لتر)", price: 9 },
+                    { id: "o10", name: "سمنة الدرة (4 لتر)", price: 17 },
+                    { id: "o11", name: "سمنة خانم 1 كغ (1 علبة)", price: 13 },
+                    { id: "o12", name: "سمنة خانم 1 كغ (2 علبة)", price: 25 },
+                    { id: "o13", name: "زيت زيتون الفصول الأربعة", price: 8.99 },
+                    { id: "o14", name: "زيت زيتون هابو", price: 8 }
                 ]
             },
             {
-                title: "🫒 الزيتون",
-                label: "زيتون",
-                bgColor: "bg-lime-100",
-                textColor: "text-lime-800",
+                section: "🫒 الزيتون والمخللات",
+                type: "زيتون ومخلل",
                 items: [
-                    ["زيتون أخضر خيرات الشام 2 كغ", 9.99],
-                    ["زيتون الفصول أسود كلاماتا 1 كغ 2 علبة", 10],
-                    ["زيتون الفصول أسود كلاماتا 600غ 2 علبة", 5],
-                    ["زيتون الفصول أخضر محشي 600غ 2 علبة", 5],
-                    ["زيتون الفصول 600غ 4 علب", 10],
-                    ["سلطة زيتون درة 675غ 3 علب", 10],
-                    ["سلطة زيتون درة 325غ 2 علبة", 5],
-                    ["زيتون الدرة أخضر 1.3كغ 2 مرطبان", 10],
-                    ["زيتون أخضر 2.8كغ 1 سطل", 10],
-                    ["زيتون أخضر شمسين 1 كغ 3 علب", 10],
-                    ["زيتون داماس 1 كغ 3 علب", 10],
-                    ["زيتون شهية سطل أخضر حد 1.5 كغ", 8],
-                    ["زيتون الشهية سطل أسود عطون 1.5 كغ", 9]
+                    { id: "v1", name: "زيتون أخضر خيرات الشام 2 كغ (سطل)", price: 9.99 },
+                    { id: "v2", name: "زيتون الفصول أسود كلاماتا 1 كغ (2 علبة)", price: 10 },
+                    { id: "v3", name: "زيتون الفصول أسود كلاماتا 600 غ (2 علبة)", price: 5 },
+                    { id: "v4", name: "زيتون الفصول أخضر محشي 600 غ (2 علبة)", price: 5 },
+                    { id: "v5", name: "زيتون الفصول 600 غ (4 علب)", price: 10 },
+                    { id: "v6", name: "سلطة زيتون درة 675 غ (3 علب)", price: 10 },
+                    { id: "v7", name: "سلطة زيتون درة 325 غ (2 علبة)", price: 5 },
+                    { id: "v8", name: "زيتون الدرة أخضر 1.3 كغ (2 مرطبان)", price: 10 },
+                    { id: "v9", name: "زيتون أخضر 2.8 كغ (سطل)", price: 10 },
+                    { id: "v10", name: "زيتون أخضر شمسين 1 كغ (3 علب)", price: 10 },
+                    { id: "v11", name: "زيتون داماس 1 كغ (3 علب)", price: 10 },
+                    { id: "v12", name: "زيتون شهية سطل أخضر حد 1.5 كغ", price: 8 },
+                    { id: "v13", name: "زيتون الشهية سطل أسود عطون 1.5 كغ", price: 9 },
+                    { id: "v14", name: "مخللات حجم كبير 2800 غ", price: 5 },
+                    { id: "v15", name: "مخللات حجم وسط 1 كغ (3 مرطبان)", price: 10 },
+                    { id: "v16", name: "مخللات حجم صغير (5 مرطبان)", price: 10 }
                 ]
             },
             {
-                title: "🥒 المخللات",
-                label: "مخللات",
-                bgColor: "bg-green-100",
-                textColor: "text-green-800",
+                section: "🥩 المرتديلا",
+                type: "مرتديلا",
                 items: [
-                    ["مخللات حجم كبير 1 مرطبان", 5],
-                    ["مخللات حجم وسط 3 مرطبانات", 10],
-                    ["مخللات حجم صغير 5 مرطبانات", 10]
+                    { id: "m1", name: "مرتديلا الراعي 840 غ (2 علبة)", price: 9 },
+                    { id: "m2", name: "مرتديلا الراعي 200 غ (4 علب)", price: 5 },
+                    { id: "m3", name: "مرتديلا الراعي 380 غ (5 علب)", price: 10 },
+                    { id: "m4", name: "مرتديلا زوان 850 غ (2 علبة)", price: 10 },
+                    { id: "m5", name: "مرتديلا سومر 850 غ (2 علبة)", price: 9 },
+                    { id: "m6", name: "مرتديلا سومر 340 غ (5 علب)", price: 10 },
+                    { id: "m7", name: "مرتديلا هنا 200 غ (3 علب)", price: 5 },
+                    { id: "m8", name: "مرتديلا هنا 340 غ (2 علبة)", price: 5 },
+                    { id: "m9", name: "مرتديلا هنا 850 غ (2 علبة)", price: 10 }
                 ]
             },
             {
-                title: "🥜 المكسرات، التسالي، والشيبس",
-                label: "مكسرات وتسالي",
-                bgColor: "bg-orange-100",
-                textColor: "text-orange-900",
+                section: "🥜 المكسرات، الشطة، والمعلبات",
+                type: "متنوعات",
                 items: [
-                    ["بزر ميال 5 كغ", 18],
-                    ["بزر ميال 3 كغ", 14],
-                    ["تخليطة سوبر مالح / مدخن 3 كغ", 40],
-                    ["شيبس ديربي 3 أكياس", 10]
+                    { id: "n1", name: "بزر ميال (5 كغ)", price: 18 },
+                    { id: "n2", name: "بزر ميال (3 كغ)", price: 14 },
+                    { id: "n3", name: "تخليطة سوبر مالح / مدخن (3 كغ)", price: 40 },
+                    { id: "n4", name: "شيبس ديربي (3 أكياس)", price: 10 },
+                    { id: "n5", name: "دبس رمان درة صغير (5 قناني)", price: 10 },
+                    { id: "n6", name: "شطة رنا كبير (2 حبة)", price: 5 },
+                    { id: "n7", name: "شطة رنا وسط (4 حبات)", price: 5 },
+                    { id: "n8", name: "شطة رنا صغير (6 حبات)", price: 5 },
+                    { id: "n9", name: "شطة الفصول الأربعة وسط (5 حبات)", price: 5 },
+                    { id: "n10", name: "شطة الفصول الأربعة صغير (2 حبة)", price: 1 },
+                    { id: "n11", name: "طحينة الفصول / داماس (3 علب)", price: 5 },
+                    { id: "n12", name: "طحينة الشهية 800 غ (2 علبة)", price: 10 },
+                    { id: "n13", name: "حلاوة الدرة (700 غ)", price: 5 },
+                    { id: "n14", name: "حمص ناعم الكسيح (3 علب)", price: 10 },
+                    { id: "n15", name: "حمص بالطحينة داماس/شتورة (4 علب)", price: 5 }
                 ]
             },
             {
-                title: "🥩 المرتديلا",
-                label: "مرتديلا",
-                bgColor: "bg-red-100",
-                textColor: "text-red-800",
+                section: "🥫 البقوليات والأسماك المعلبة",
+                type: "معلبات",
                 items: [
-                    ["مرتديلا الراعي 840غ 2 علبة", 9],
-                    ["مرتديلا الراعي 200غ 4 علب", 5],
-                    ["مرتديلا الراعي 380غ 5 علب", 10],
-                    ["مرتديلا زوان 850غ 2 علبة", 10],
-                    ["مرتديلا سومر 850غ 2 علبة", 9],
-                    ["مرتديلا سومر 340غ 5 علب", 10],
-                    ["مرتديلا هنا 200غ 3 علب", 5],
-                    ["مرتديلا هنا 340غ 2 علبة", 5],
-                    ["مرتديلا هنا 850غ 2 علبة", 10]
+                    { id: "f1", name: "تشكيلة محاشي معلبة الشهية (3 علب)", price: 5 },
+                    { id: "f2", name: "تونة كافة الأنواع (4 علب)", price: 5 },
+                    { id: "f3", name: "سردين (6 علب)", price: 5 },
+                    { id: "f4", name: "حمص وفول الدرة (6 علب)", price: 5 },
+                    { id: "f5", name: "فول الكسيح (5 علب)", price: 5 },
+                    { id: "f6", name: "فول الشهية (8 علب)", price: 5 },
+                    { id: "f7", name: "حمص حب 800 غ (4 علب)", price: 5 },
+                    { id: "f8", name: "حمص حب صغير (6 علب)", price: 5 },
+                    { id: "f9", name: "حمص الكسيح (3 علب)", price: 10 },
+                    { id: "f10", name: "فاصولية حب 800 غ (4 علب)", price: 5 },
+                    { id: "f11", name: "فاصولية حب صغير (6 علب)", price: 5 },
+                    { id: "f12", name: "لونا فاصولية حب بصلصة (6 علب)", price: 5 },
+                    { id: "f13", name: "خضار مجففة محفرة (2 كيس)", price: 5 }
                 ]
             },
             {
-                title: "🌶️ الشطة، الصلصات، والدبس",
-                label: "صلصات ودبس",
-                bgColor: "bg-rose-100",
-                textColor: "text-rose-800",
+                section: "🍪 البسكويت، الزعتر، والمشروبات",
+                type: "حلويات ومشروبات",
                 items: [
-                    ["دبس رمان درة صغير 5 قناني", 10],
-                    ["شطة رنا كبير 2 بـ", 5],
-                    ["شطة رنا وسط 4 بـ", 5],
-                    ["شطة رنا صغير 6 بـ", 5],
-                    ["شطة الفصول الأربعة وسط 5 بـ", 5],
-                    ["شطة الفصول الأربعة صغير 2 بـ", 1]
+                    { id: "s1", name: "جيلي أطفال (4 حبات)", price: 10 },
+                    { id: "s2", name: "مربى التين والمشمش (3 مرطبان)", price: 10 },
+                    { id: "s3", name: "معمول كافة الأنواع (2 علبة)", price: 5 },
+                    { id: "s4", name: "برازق أو بيتفور شامية", price: 5 },
+                    { id: "s5", name: "بسكوت ديمة/ياسمين (3 علب)", price: 10 },
+                    { id: "s6", name: "بسكوت دينغو / الفاخر (3 علب)", price: 10 },
+                    { id: "s7", name: "تشكيلة بسكويت (5 بكيتات)", price: 10 },
+                    { id: "s8", name: "راحة التوفيق (2 علبة)", price: 5 },
+                    { id: "s9", name: "زعتر الأسرة (3 أكياس)", price: 5 },
+                    { id: "s10", name: "زعتر الدرة/الريان (1 كيس)", price: 5 },
+                    { id: "s11", name: "زعتر الناصر أخضر (3 أكياس)", price: 10 },
+                    { id: "s12", name: "بهارات علب (4 علب)", price: 10 },
+                    { id: "s13", name: "بهارات أظرف (1 ظرف)", price: 1 },
+                    { id: "s14", name: "مكعبات ماجي (3 علب)", price: 10 },
+                    { id: "s15", name: "ماجي بودرة تونسا (4 علب)", price: 10 },
+                    { id: "d1", name: "طرد مشروب طاقة (24 قطعة)", price: 13 },
+                    { id: "d2", name: "طرد عصير توب جوس", price: 6 },
+                    { id: "d3", name: "عصائر مركزة (3 قناني)", price: 10 },
+                    { id: "d4", name: "عرق سوس رمزي", price: 1 },
+                    { id: "d5", name: "بن الشامي (450 غ)", price: 7.99 },
+                    { id: "d6", name: "بن الأديب (500 غ)", price: 7.99 },
+                    { id: "d7", name: "قهوة ياهلا (12 ظرف)", price: 9 },
+                    { id: "d8", name: "شاي تركي سيلاني 1 كغ", price: 4.99 },
+                    { id: "d9", name: "شاي محمود فرط", price: 5.49 },
+                    { id: "d10", name: "متة (3 علب)", price: 5 }
                 ]
             },
             {
-                title: "🍯 الطحينة، الحمص الناعم، والحلاوة",
-                label: "طحينة وحلاوة",
-                bgColor: "bg-yellow-200",
-                textColor: "text-yellow-900",
+                section: "🥖 المخبوزات والمستلزمات المنزلية",
+                type: "منزليات",
                 items: [
-                    ["طحينة الفصول الأربعة / داماس 3 علب", 5],
-                    ["طحينة الشهية 2 علبة", 10],
-                    ["حلاوة الدرة 1 علبة", 5],
-                    ["حمص ناعم الكسيح 3 علب", 10],
-                    ["حمص بالطحينة داماس / شتورة 4 علب", 5]
-                ]
-            },
-            {
-                title: "🥫 المعلبات والبقوليات والأسماك",
-                label: "معلبات",
-                bgColor: "bg-teal-100",
-                textColor: "text-teal-800",
-                items: [
-                    ["تشكيلة محاشي معلبة الشهية 3 علب", 5],
-                    ["تونة 4 علب", 5],
-                    ["سردين 6 علب", 5],
-                    ["حمص وفول الدرة 6 علب", 5],
-                    ["فول الكسيح 5 علب", 5],
-                    ["فول الشهية 8 علب", 5],
-                    ["حمص حب 800غ 4 علب", 5],
-                    ["حمص حب صغير 6 علب", 5],
-                    ["حمص الكسيح 3 علب", 10],
-                    ["فاصولية حب 800غ 4 علب", 5],
-                    ["فاصولية حب صغير 6 علب", 5],
-                    ["لونا فاصولية حب بصلصة بندورة 6 علب", 5],
-                    ["خضار مجففة 2 كيس", 5]
-                ]
-            },
-            {
-                title: "🍪 البسكويت، الحلويات، والمربيات",
-                label: "بسكويت وحلويات",
-                bgColor: "bg-pink-100",
-                textColor: "text-pink-800",
-                items: [
-                    ["جيلي أطفال 4 بـ", 10],
-                    ["مربى 3 مرطبانات", 10],
-                    ["معمول 2 علبة", 5],
-                    ["برازق شامية 1 علبة", 5],
-                    ["بسكوت بالتمر 3 علب", 10],
-                    ["بسكوت دينغو 3 علب", 10],
-                    ["تشكيلة بسكويت 5 بكيتات", 10],
-                    ["راحة التوفيق 2 علبة", 5]
-                ]
-            },
-            {
-                title: "🌿 الزعتر، البهارات، والماجي",
-                label: "زعتر وبهارات",
-                bgColor: "bg-emerald-100",
-                textColor: "text-emerald-800",
-                items: [
-                    ["زعتر الأسرة 3 أكياس", 5],
-                    ["زعتر الدرة / الريان 1 كيس", 5],
-                    ["زعتر الناصر أخضر 3 أكياس", 10],
-                    ["بهارات علب 4 علب", 10],
-                    ["بهارات أظرف 1 ظرف", 1],
-                    ["مكعبات ماجي 3 علب", 10],
-                    ["ماجي بودرة تونسا 4 علب", 10]
-                ]
-            },
-            {
-                title: "🧃 المشروبات، الشاي، القهوة، والمتة",
-                label: "مشروبات وقهوة",
-                bgColor: "bg-blue-100",
-                textColor: "text-blue-800",
-                items: [
-                    ["طرد مشروب طاقة 24 قطعة", 13],
-                    ["طرد عصير توب جوس", 6],
-                    ["عصائر مركزة 3 قناني", 10],
-                    ["عرق سوس رمزي 1 ظرف", 1],
-                    ["بن الشامي 1 علبة", 7.99],
-                    ["بن الأديب 1 علبة", 7.99],
-                    ["قهوة ياهلا 1 علبة", 9],
-                    ["شاي تركي سيلاني 1 باكت", 4.99],
-                    ["شاي محمود فرط 1 باكت", 5.49],
-                    ["متة 3 علب", 5]
-                ]
-            },
-            {
-                title: "🥖 المخبوزات",
-                label: "مخبوزات",
-                bgColor: "bg-amber-200",
-                textColor: "text-amber-900",
-                items: [
-                    ["خبز 1 ربطة", 0.50]
-                ]
-            },
-            {
-                title: "🧻 المستلزمات المنزلية والفحم",
-                label: "مستلزمات منزلية",
-                bgColor: "bg-slate-200",
-                textColor: "text-slate-800",
-                items: [
-                    ["محارم معطرة 2 بكيت", 5],
-                    ["فحم 27 كل 3 علب", 12],
-                    ["فحم 27 كل 4 علب", 15],
-                    ["رول سفر طعام 3 رولات", 5],
-                    ["عبوات غاز منزلي 3 عبوات", 10],
-                    ["عبوات غاز سفري صغيرة 3 عبوات", 5],
-                    ["طقم كاسات شاي 1 طقم", 4]
+                    { id: "h1", name: "خبز (1 ربطة)", price: 0.50 },
+                    { id: "h2", name: "محارم معطرة (2 بكيت)", price: 5 },
+                    { id: "h3", name: "فحم 27 (3 علب)", price: 12 },
+                    { id: "h4", name: "فحم 27 (4 علب)", price: 15 },
+                    { id: "h5", name: "رول سفر طعام (3 رولات)", price: 5 },
+                    { id: "h6", name: "عبوات غاز منزلي (3 عبوات)", price: 10 },
+                    { id: "h7", name: "عبوات غاز سفري صغيرة (3 عبوات)", price: 5 },
+                    { id: "h8", name: "طقم كاسات شاي (12 حبة)", price: 4 }
                 ]
             }
         ];
 
-        let globalProductId = 0;
-        const productsMap = {};
+        // تخزين العربة وسجل المنتجات
         const cart = {};
+        const productLookup = {}; 
 
-        // بناء واجهة الأقسام
-        function renderCategories() {
-            const container = document.getElementById('categories-container');
-            let htmlContent = '';
+        // توليد العروض في الصفحة
+        const container = document.getElementById("products-container");
+        productsData.forEach(section => {
+            const secTitle = document.createElement("div");
+            secTitle.className = "section-title";
+            secTitle.innerText = section.section;
+            container.appendChild(secTitle);
 
-            categoriesData.forEach(category => {
-                htmlContent += `
-                    <div class="mb-10">
-                        <div class="category-header">
-                            <h2 class="text-xl font-bold text-white p-3 rounded-xl shadow-sm border-r-4 border-[#dca331]" style="background-color: #123e73;">${category.title}</h2>
-                        </div>
-                        <div class="strict-grid">
-                `;
+            const grid = document.createElement("div");
+            grid.className = "grid-container";
 
-                category.items.forEach(itemArr => {
-                    globalProductId++;
-                    const pId = globalProductId;
-                    const pName = itemArr[0];
-                    const pPrice = itemArr[1];
-                    
-                    productsMap[pId] = { name: pName, price: pPrice };
+            section.items.forEach(item => {
+                cart[item.id] = 0;
+                productLookup[item.id] = item; // لحفظ بيانات المنتج لسهولة الوصول
 
-                    htmlContent += `
-                        <div class="item-card">
-                            <div class="item-category-banner ${category.bgColor} ${category.textColor}">
-                                ${category.label}
-                            </div>
-                            <div class="p-3 flex flex-col justify-between flex-grow gap-3">
-                                <h3 class="text-[13px] sm:text-[15px] font-bold text-gray-800 leading-snug line-clamp-3 min-h-[3rem]">${pName}</h3>
-                                <div>
-                                    <div class="font-black text-[15px] sm:text-lg mb-3" style="color: #16a34a;" dir="ltr">${pPrice.toFixed(2)} €</div>
-                                    <div class="flex items-center justify-between bg-gray-50 border rounded-lg p-1.5 shadow-inner">
-                                        <button onclick="changeQty(${pId}, 1)" class="w-9 h-9 text-white rounded-md text-xl font-bold flex items-center justify-center hover:opacity-90 active:scale-90" style="background-color: #123e73;">+</button>
-                                        <span id="qty-${pId}" class="font-bold text-gray-800 text-base w-8 text-center">0</span>
-                                        <button onclick="changeQty(${pId}, -1)" class="w-9 h-9 bg-red-100 text-red-600 rounded-md text-xl font-bold flex items-center justify-center hover:bg-red-200 active:scale-90">-</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                htmlContent += `
-                        </div>
+                const card = document.createElement("div");
+                card.className = "product-card";
+                card.innerHTML = `
+                    <div class="product-type">${section.type}</div>
+                    <div class="product-name">${item.name}</div>
+                    <div class="product-price">${item.price} €</div>
+                    <div class="qty-controls">
+                        <button class="qty-btn minus" onclick="updateQty('${item.id}', -1)">-</button>
+                        <span class="qty-display" id="qty-${item.id}">0</span>
+                        <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
                     </div>
                 `;
+                grid.appendChild(card);
             });
+            container.appendChild(grid);
+        });
 
-            container.innerHTML = htmlContent;
+        // تحديث الكميات وحساب المجموع
+        function updateQty(id, change) {
+            let newQty = cart[id] + change;
+            if (newQty >= 0) {
+                cart[id] = newQty;
+                document.getElementById(`qty-${id}`).innerText = newQty;
+                
+                // تحديث الكمية داخل نافذة المراجعة إذا كانت مفتوحة
+                const modalQtyDisplay = document.getElementById(`modal-qty-${id}`);
+                if (modalQtyDisplay) {
+                    modalQtyDisplay.innerText = newQty;
+                    // إذا أصبحت الكمية صفر، نزيلها من المراجعة
+                    if (newQty === 0) renderModalItems(); 
+                }
+                
+                calculateTotal();
+            }
         }
 
-        // تحديث الكمية
-        function changeQty(id, change) {
-            cart[id] = (cart[id] || 0) + change;
-            if (cart[id] < 0) cart[id] = 0;
-            document.getElementById(`qty-${id}`).innerText = cart[id];
-            calculateTotal();
-        }
-
-        // حساب الإجمالي
         function calculateTotal() {
             let total = 0;
             for (let id in cart) {
                 if (cart[id] > 0) {
-                    total += cart[id] * productsMap[id].price;
+                    total += cart[id] * productLookup[id].price;
                 }
             }
-            document.getElementById('total-price').innerText = total.toFixed(2) + ' €';
+            document.getElementById("total-price").innerText = total.toFixed(2) + " €";
         }
 
-        // نوافذ التنبيه
-        function showModal(msg) {
-            document.getElementById('modal-msg').innerText = msg;
-            document.getElementById('modal').classList.remove('hidden');
+        // دوال نافذة المراجعة (Modal)
+        const modal = document.getElementById("cartModal");
+        const modalList = document.getElementById("modal-items-list");
+
+        function openModal() {
+            renderModalItems();
+            modal.style.display = "flex";
         }
+
         function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
+            modal.style.display = "none";
         }
 
-        // حفظ كقائمة مشتريات (واتساب عام)
-        function saveShoppingList() {
-            let orderItems = '';
+        // إغلاق النافذة عند الضغط خارجها
+        window.onclick = function(event) {
+            if (event.target == modal) closeModal();
+        }
+
+        function renderModalItems() {
+            modalList.innerHTML = "";
+            let hasItems = false;
+
+            for (let id in cart) {
+                if (cart[id] > 0) {
+                    hasItems = true;
+                    const item = productLookup[id];
+                    const row = document.createElement("div");
+                    row.className = "modal-item-row";
+                    row.innerHTML = `
+                        <div class="modal-item-name">${item.name} <br><span style="color:#e44d26; font-size:0.8rem;">${item.price} €</span></div>
+                        <div class="qty-controls" style="width: 100px;">
+                            <button class="qty-btn minus" style="width: 25px; height: 25px; font-size: 1rem;" onclick="updateQty('${id}', -1)">-</button>
+                            <span class="qty-display" id="modal-qty-${id}" style="font-size: 1rem;">${cart[id]}</span>
+                            <button class="qty-btn" style="width: 25px; height: 25px; font-size: 1rem;" onclick="updateQty('${id}', 1)">+</button>
+                        </div>
+                    `;
+                    modalList.appendChild(row);
+                }
+            }
+
+            if (!hasItems) {
+                modalList.innerHTML = `<div class="modal-empty">🛒 السلة فارغة حالياً</div>`;
+            }
+        }
+
+        // إرسال الطلب للواتساب
+        function sendWhatsApp() {
+            let text = "🛒 *قائمة مشترياتي من ماركت النجوم:*\n\n";
             let total = 0;
             let hasItems = false;
 
             for (let id in cart) {
                 if (cart[id] > 0) {
                     hasItems = true;
-                    const prod = productsMap[id];
-                    const subtotal = cart[id] * prod.price;
-                    total += subtotal;
-                    orderItems += `- ${cart[id]}x ${prod.name} (${subtotal.toFixed(2)}€)\n`;
+                    let item = productLookup[id];
+                    let lineTotal = cart[id] * item.price;
+                    text += `▪️ ${item.name}\n   العدد: ${cart[id]} | السعر: ${lineTotal.toFixed(2)}€\n`;
+                    total += lineTotal;
                 }
             }
+            
+            // جلب نص الطلبات الخاصة
+            const specialRequests = document.getElementById("special-requests").value.trim();
+            if (specialRequests !== "") {
+                text += `\n📝 *طلبات خاصة:*\n${specialRequests}\n`;
+            }
 
-            if (!hasItems) {
-                showModal('قائمة المشتريات فارغة. الرجاء اختيار العروض التي ترغب بتسجيلها أولاً!');
+            if (!hasItems && specialRequests === "") {
+                alert("الرجاء اختيار منتج أو كتابة طلب خاص أولاً!");
                 return;
             }
 
-            const text = `قائمة مشترياتي من ماركت النجوم:\n${orderItems}المجموع: ${total.toFixed(2)}€`;
-            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        }
+            if (total > 0) {
+                text += `\n💰 *المجموع النهائي: ${total.toFixed(2)} €*\n`;
+            }
+            text += `\n📅 أوقات الدوام: من 10 صباحاً لـ 8 مساءً`;
 
-        window.onload = renderCategories;
+            let encodedText = encodeURIComponent(text);
+            window.location.href = `https://wa.me/?text=${encodedText}`;
+        }
     </script>
 </body>
 </html>
